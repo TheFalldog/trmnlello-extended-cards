@@ -1,3 +1,4 @@
+const CARD_CHARS = 40; // hard cap before CSS clamp
 const DONE_RE = /\b(done|complete|completed|finished|shipped|closed|deployed)\b/i;
 
 function clip(s, n) {
@@ -19,11 +20,10 @@ function card(c, timezone) {
   const b = c.badges ?? {};
   const done = c.dueComplete || (b.checkItems > 0 && b.checkItems === b.checkItemsChecked);
 
-  return `<div class="divider"></div>
-<div class="item">
-  <div class="content">
-    <span class="title title--small lg:title--base" data-clamp="2"${done ? ' style="text-decoration:line-through;opacity:0.5;"' : ''}>${esc(c.name)}</span>
-    ${dueStr ? `<span class="label label--small${overdue ? ' label--error' : ' label--gray'}">${dueStr}</span>` : ''}
+  return `<div class="item">
+  <div class="content" style="flex-direction:row;align-items:center;gap:4px;min-width:0;">
+    <span class="title title--small" data-clamp="1" style="flex:1;min-width:0;${done ? 'text-decoration:line-through;opacity:0.5;' : ''}">${esc(clip(c.name, CARD_CHARS))}</span>
+    ${dueStr ? `<span class="label label--small${overdue ? ' label--error' : ' label--gray'}" style="flex-shrink:0;">${dueStr}</span>` : ''}
   </div>
 </div>`;
 }
@@ -47,7 +47,7 @@ function cols(columns, max, maxCards, timezone) {
 
 export function full(boardName, columns, timezone) {
   const n = columns.length;
-  const maxCards = n <= 3 ? 8 : n <= 4 ? 6 : n <= 5 ? 4 : 3;
+  const maxCards = 20; // let data-overflow hide what doesn't fit
   return `<div class="view view--full">
   <div class="layout layout--col layout--stretch gap">
     <div class="columns">${cols(columns, 6, maxCards, timezone)}</div>
@@ -62,7 +62,7 @@ export function full(boardName, columns, timezone) {
 export function halfVertical(boardName, columns, timezone) {
   return `<div class="view view--half_vertical">
   <div class="layout layout--col layout--stretch gap">
-    <div class="columns">${cols(columns, 3, 4, timezone)}</div>
+    <div class="columns">${cols(columns, 3, 12, timezone)}</div>
   </div>
   <div class="title_bar">
     <span class="title">Trello private boards</span>
@@ -74,7 +74,7 @@ export function halfVertical(boardName, columns, timezone) {
 export function halfHorizontal(boardName, columns, timezone) {
   return `<div class="view view--half_horizontal">
   <div class="layout layout--col layout--stretch gap">
-    <div class="columns">${cols(columns, 6, 2, timezone)}</div>
+    <div class="columns">${cols(columns, 6, 5, timezone)}</div>
   </div>
   <div class="title_bar">
     <span class="title">Trello private boards</span>
@@ -86,7 +86,7 @@ export function halfHorizontal(boardName, columns, timezone) {
 export function quadrant(boardName, columns, timezone) {
   return `<div class="view view--quadrant">
   <div class="layout layout--col layout--stretch gap">
-    <div class="columns">${cols(columns, 2, 3, timezone)}</div>
+    <div class="columns">${cols(columns, 2, 5, timezone)}</div>
   </div>
   <div class="title_bar">
     <span class="title">Trello private boards</span>
